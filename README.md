@@ -94,15 +94,15 @@ http://127.0.0.1:5000
 
 ### Home Page
 
-![Home](screenshots/home.png)
+![Home](home.png)
 
 ### Safe Prediction
 
-![Safe](screenshots/safe_prediction.png)
+![Safe](safe_prediction.png.png)
 
 ### Phishing Prediction
 
-![Phishing](screenshots/phishing_prediction.png)
+![Phishing](phishing_prediction.png)
 
 ## 📈 Future Improvements
 
