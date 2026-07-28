@@ -90,6 +90,20 @@ http://127.0.0.1:5000
 
 ---
 
+## 📸 Project Screenshots
+
+### Home Page
+
+![Home](screenshots/home.png)
+
+### Safe Prediction
+
+![Safe](screenshots/safe_prediction.png)
+
+### Phishing Prediction
+
+![Phishing](screenshots/phishing_prediction.png)
+
 ## 📈 Future Improvements
 
 - Deep Learning Model
