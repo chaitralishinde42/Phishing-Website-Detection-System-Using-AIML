@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | PhishGuard AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>PhishGuard AI</span>
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{{ url_for('history') }}" class="nav-btn">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+            </a>
+
+            <span class="welcome-text">
+                <i class="fa-solid fa-user"></i>
+                {{ user_name }}
+            </span>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+
+            <section class="dashboard-hero fade-in-up">
+                <div class="dashboard-hero-left">
+                    <span class="dashboard-badge">
+                        <i class="fa-solid fa-lock"></i> Secure AI Analysis Panel
+                    </span>
+                    <h1>Welcome, {{ user_name }}</h1>
+                    <p>
+                        Analyze suspicious URLs using machine learning models,
+                        intelligent phishing indicators, and real-time cyber risk scoring.
+                    </p>
+                </div>
+
+                <div class="dashboard-hero-right">
+                    <div class="mini-status-card">
+                        <i class="fa-solid fa-shield-virus"></i>
+                        <div>
+                            <h4>System Status</h4>
+                            <p>AI Engine Active</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            
+
+            <section class="dashboard-card animate-card">
+                <div class="card-head">
+                    <div>
+                        <h2>Analyze Website URL</h2>
+                        <p class="dashboard-subtitle">
+                            Submit a website link to detect phishing probability and risk level.
+                        </p>
+                    </div>
+                    <div class="scan-chip">
+                        <i class="fa-solid fa-satellite-dish"></i> Live Scan
+                    </div>
+                </div>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <p class="msg {{ category }}">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" id="analyzeForm">
+                    <div class="input-group dashboard-input">
+                        <i class="fa-solid fa-globe"></i>
+                        <input type="text" name="url" placeholder="https://example.com" required>
+                    </div>
+
+                    <button type="submit" class="main-btn full-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i> Analyze Now
+                    </button>
+                </form>
+
+                <div id="loadingBox" class="loading-box premium-loader-box">
+                    <div class="loader"></div>
+                    <p class="loading-title">AI models are analyzing the URL...</p>
+
+                    <div class="scan-steps">
+                        <div class="scan-step"><span></span> Extracting URL features</div>
+                        <div class="scan-step"><span></span> Checking Website Content</div>
+                        <div class="scan-step"><span></span> Checking domain patterns</div>
+                        <div class="scan-step"><span></span> Running ML models</div>
+                        <div class="scan-step"><span></span> Generating final risk score</div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById("analyzeForm");
+        const loadingBox = document.getElementById("loadingBox");
+
+        if (form) {
+            form.addEventListener("submit", function() {
+                loadingBox.style.display = "flex";
+            });
+        }
+    </script>
+
+</body>
+</html>

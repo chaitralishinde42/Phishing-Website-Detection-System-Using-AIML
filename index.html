@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Phishing Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+   <nav class="navbar">
+    <div class="nav-left">
+        <div class="logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>PhishGuard AI</span>
+        </div>
+    </div>
+
+    <div class="nav-right">
+        <a href="{{ url_for('home') }}" class="nav-btn">Home</a>
+        <a href="{{ url_for('login') }}" class="nav-btn">Login</a>
+        <a href="{{ url_for('register') }}" class="nav-btn register-btn">Register</a>
+    </div>
+</nav>
+
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-grid"></div>
+
+        <div class="hero-content fade-in-up">
+            <div class="hero-badge">
+                <i class="fa-solid fa-lock"></i>
+                AI-Powered Cyber Protection
+            </div>
+
+            <h1>Phishing Website Detection <span>Using AI & ML</span></h1>
+
+            <p>
+                Detect suspicious and malicious websites using intelligent machine learning,
+                advanced URL analysis, and real-time cyber risk scoring with a modern
+                secure interface.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="{{ url_for('login') }}" class="main-btn">
+                    <i class="fa-solid fa-right-to-bracket"></i> Get Started
+                </a>
+                <a href="{{ url_for('register') }}" class="secondary-btn">
+                    <i class="fa-solid fa-user-plus"></i> Create Account
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <h2>How It Works</h2>
+        <p class="section-subtitle">Simple, fast, secure, and intelligent phishing detection workflow</p>
+
+        <div class="feature-grid">
+            <div class="feature-card animate-card">
+                <div class="icon-circle"><i class="fa-solid fa-link"></i></div>
+                <h3>1. Submit URL</h3>
+                <p>Enter any website URL to inspect possible phishing behavior and suspicious patterns.</p>
+            </div>
+
+            <div class="feature-card animate-card">
+                <div class="icon-circle"><i class="fa-solid fa-brain"></i></div>
+                <h3>2. AI Analysis</h3>
+                <p>AI models analyze domain signals, URL structure, and hidden phishing indicators.</p>
+            </div>
+
+            <div class="feature-card animate-card">
+                <div class="icon-circle"><i class="fa-solid fa-chart-line"></i></div>
+                <h3>3. Instant Results</h3>
+                <p>Receive phishing prediction, confidence score, and risk level in just seconds.</p>
+            </div>
+
+            <div class="feature-card animate-card">
+                <div class="icon-circle"><i class="fa-solid fa-file-arrow-down"></i></div>
+                <h3>4. Download Report</h3>
+                <p>Generate a professional report for project demonstration and documentation use.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section">
+        <div class="about-box fade-in-up">
+            <h2>Why Use This System?</h2>
+            <p>
+                This platform combines machine learning, intelligent feature extraction,
+                and anomaly detection techniques to identify phishing websites more accurately.
+                It is designed for academic project demonstration, cybersecurity learning,
+                and smart real-world URL threat analysis.
+            </p>
+        </div>
+    </section>
+
+    <section class="contact-section">
+    <h2>Contact & Support</h2>
+    <p class="section-subtitle">Get in touch for queries, support, or collaboration</p>
+
+    <div class="contact-container">
+        <div class="contact-info">
+            <h3>Get In Touch</h3>
+            <p>
+                Have questions about phishing detection or need help with the system?
+                Feel free to reach out.
+            </p>
+
+            <div class="contact-item">
+                <i class="fa-solid fa-envelope"></i>
+                <span>support@phishguardai.com</span>
+            </div>
+
+            <div class="contact-item">
+                <i class="fa-solid fa-phone"></i>
+                <span>+91 8007882313</span>
+            </div>
+
+            <div class="contact-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Pune, Maharashtra, India</span>
+            </div>
+
+            <div class="contact-social">
+                <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#"><i class="fa-brands fa-github"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            </div>
+        </div>
+
+        <div class="contact-form">
+            <h3>Send Message</h3>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p class="msg {{ category }}">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('contact') }}" method="POST">
+                <div class="input-group">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" name="name" placeholder="Your Name" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" name="email" placeholder="Your Email" required>
+                </div>
+
+                <div class="input-group">
+                    <i class="fa-solid fa-tag"></i>
+                    <input type="text" name="subject" placeholder="Subject" required>
+                </div>
+
+                <div class="input-group textarea-group">
+                    <i class="fa-solid fa-message"></i>
+                    <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+                </div>
+
+                <button type="submit" class="main-btn full-btn">
+                    <i class="fa-solid fa-paper-plane"></i> Send Message
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

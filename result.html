@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Result | PhishGuard AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root{
+            --bg1:#0b1220;
+            --bg2:#121b2f;
+            --card:rgba(255,255,255,0.08);
+            --stroke:rgba(255,255,255,0.12);
+            --text:#f5f7fb;
+            --muted:#a9b4c8;
+            --safe:#15c47e;
+            --warn:#f5a524;
+            --danger:#ef4444;
+            --blue:#4f8cff;
+            --cyan:#39c6ff;
+            --shadow:0 20px 45px rgba(0,0,0,0.25);
+            --radius:22px;
+        }
+
+        body.dashboard-body{
+            background:
+                radial-gradient(circle at top left, rgba(79,140,255,0.18), transparent 26%),
+                radial-gradient(circle at top right, rgba(57,198,255,0.15), transparent 24%),
+                linear-gradient(135deg, var(--bg1), var(--bg2));
+            color: var(--text);
+        }
+
+        .dashboard-main{
+            padding: 30px 20px 50px;
+        }
+
+        .dashboard-container{
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        .result-card{
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 28px;
+        }
+
+        .hero-result{
+            display:grid;
+            grid-template-columns: 1.3fr 0.9fr;
+            gap: 22px;
+            margin-bottom: 24px;
+        }
+
+        .hero-left, .hero-right, .info-panel, .visual-card, .graph-section, .friendly-card{
+            background: var(--card);
+            border: 1px solid var(--stroke);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .hero-left{
+            padding: 26px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-left::after{
+            content:"";
+            position:absolute;
+            top:-60px;
+            right:-60px;
+            width:180px;
+            height:180px;
+            background: radial-gradient(circle, rgba(255,255,255,0.12), transparent 65%);
+            border-radius:50%;
+        }
+
+        .hero-top{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            flex-wrap:wrap;
+            margin-bottom:18px;
+        }
+
+        .hero-title{
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 8px;
+            line-height: 1.2;
+        }
+
+        .hero-sub{
+            color: var(--muted);
+            font-size: 0.98rem;
+            margin: 0;
+            max-width: 700px;
+        }
+
+        .risk-chip{
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .risk-chip.safe{
+            background: rgba(21,196,126,0.14);
+            color: #8ff0c3;
+            border-color: rgba(21,196,126,0.35);
+        }
+
+        .risk-chip.warn{
+            background: rgba(245,165,36,0.16);
+            color: #ffd48b;
+            border-color: rgba(245,165,36,0.35);
+        }
+
+        .risk-chip.danger{
+            background: rgba(239,68,68,0.16);
+            color: #ffabab;
+            border-color: rgba(239,68,68,0.35);
+        }
+
+        .verdict-strip{
+            display:grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap:14px;
+            margin-top:18px;
+        }
+
+        .mini-stat{
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .mini-stat small{
+            color: var(--muted);
+            display:block;
+            margin-bottom:8px;
+            font-size:0.85rem;
+        }
+
+        .mini-stat strong{
+            font-size:1.05rem;
+            word-break: break-word;
+        }
+
+        .hero-right{
+            padding: 24px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            text-align:center;
+        }
+
+        .score-label{
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+
+        .score-note{
+            margin-top: 14px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #dbe7ff;
+            font-size: 0.94rem;
+            line-height: 1.5;
+        }
+
+        .circle-box{
+            position: relative;
+            width: 210px;
+            height: 210px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .progress-ring{
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg{
+            fill:none;
+            stroke: rgba(255,255,255,0.10);
+            stroke-width: 12;
+        }
+
+        .progress-ring-fill{
+            fill:none;
+            stroke: url(#riskGradient);
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke-dasharray: 439.6;
+            stroke-dashoffset: calc(439.6 - (439.6 * var(--percent)) / 100);
+            transition: stroke-dashoffset 1.4s ease;
+        }
+
+        .circle-text{
+            position:absolute;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+        }
+
+        .circle-text span{
+            font-size: 2rem;
+            font-weight: 800;
+        }
+
+        .circle-text small{
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .friendly-grid{
+            display:grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .friendly-card{
+            padding: 22px;
+        }
+
+        .friendly-card h3{
+            margin: 0 0 12px;
+            font-size: 1.08rem;
+        }
+
+        .friendly-card p{
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .friendly-icon{
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin-bottom: 14px;
+            font-size: 1.15rem;
+            background: rgba(79,140,255,0.14);
+            color: #b9d3ff;
+        }
+
+        .result-visual-grid{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .visual-card{
+            padding: 24px;
+        }
+
+        .visual-card h3,
+        .graph-section h3{
+            margin:0 0 16px;
+            font-size: 1.15rem;
+        }
+
+        .summary-list{
+            display:grid;
+            gap:12px;
+        }
+
+        .summary-item{
+            display:flex;
+            align-items:flex-start;
+            gap:12px;
+            padding: 14px;
+            background: rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            color: #dbe7ff;
+        }
+
+        .summary-item i{
+            margin-top: 2px;
+            color: #8ec5ff;
+        }
+
+        .risk-meter{
+            margin-top: 8px;
+        }
+
+        .meter-track{
+            width:100%;
+            height:18px;
+            border-radius:999px;
+            overflow:hidden;
+            display:flex;
+            background: rgba(255,255,255,0.08);
+            border:1px solid rgba(255,255,255,0.08);
+        }
+
+        .meter-track span:nth-child(1){ background: linear-gradient(90deg, #12b76a, #22c55e); width:33.33%; }
+        .meter-track span:nth-child(2){ background: linear-gradient(90deg, #f59e0b, #fbbf24); width:33.33%; }
+        .meter-track span:nth-child(3){ background: linear-gradient(90deg, #ef4444, #dc2626); width:33.33%; }
+
+        .meter-pointer-wrap{
+            position:relative;
+            margin-top: 16px;
+            height: 28px;
+        }
+
+        .meter-pointer{
+            position:absolute;
+            top:0;
+            transform: translateX(-50%);
+            text-align:center;
+            transition: left 1.2s ease;
+        }
+
+        .meter-pointer i{
+            color:#fff;
+            font-size: 1rem;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .meter-pointer b{
+            display:block;
+            font-size: 0.82rem;
+            color:#fff;
+            margin-top: 2px;
+        }
+
+        .meter-labels{
+            margin-top: 10px;
+            display:flex;
+            justify-content:space-between;
+            color: var(--muted);
+            font-size: 0.86rem;
+        }
+
+        .graph-section{
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .bar-chart{
+            display:grid;
+            gap:18px;
+        }
+
+        .bar-item{
+            display:grid;
+            gap:10px;
+        }
+
+        .bar-label{
+            display:flex;
+            justify-content:space-between;
+            gap:12px;
+            font-weight:600;
+        }
+
+        .bar-bg{
+            width:100%;
+            height:16px;
+            background: rgba(255,255,255,0.07);
+            border-radius:999px;
+            overflow:hidden;
+        }
+
+        .bar-fill{
+            height:100%;
+            border-radius:999px;
+            width:0;
+            transition: width 1.4s ease;
+        }
+
+        .rf-bar{ background: linear-gradient(90deg, #60a5fa, #2563eb); }
+        .xgb-bar{ background: linear-gradient(90deg, #2dd4bf, #0891b2); }
+        .mlp-bar{ background: linear-gradient(90deg, #f472b6, #db2777); }
+
+        .model-note{
+            margin-top: 16px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            border:1px solid rgba(255,255,255,0.08);
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .feature-list{
+            list-style:none;
+            margin:0;
+            padding:0;
+            display:grid;
+            gap:12px;
+        }
+
+        .feature-list li{
+            display:flex;
+            justify-content:space-between;
+            gap:16px;
+            padding: 14px 16px;
+            border-radius:16px;
+            background: rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.06);
+        }
+
+        .feature-list span{
+            color:#dbe7ff;
+            word-break: break-word;
+        }
+
+        .feature-list strong{
+            color:#fff;
+            white-space: nowrap;
+        }
+
+        .action-row{
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-top: 8px;
+        }
+
+        .action-card{
+            flex:1 1 220px;
+            padding:18px;
+            border-radius:18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .action-card i{
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .action-card h4{
+            margin:0 0 8px;
+            font-size: 1rem;
+        }
+
+        .action-card p{
+            margin:0;
+            color: var(--muted);
+            line-height: 1.6;
+            font-size: 0.93rem;
+        }
+
+        .report-actions{
+            display:flex;
+            gap:12px;
+            flex-wrap:wrap;
+            margin-top:20px;
+        }
+
+        .report-btn{
+            min-width: 180px;
+            justify-content:center;
+        }
+
+        @media (max-width: 1100px){
+            .hero-result,
+            .friendly-grid,
+            .result-visual-grid{
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px){
+            .result-card{
+                padding: 18px;
+            }
+
+            .hero-title{
+                font-size: 1.6rem;
+            }
+
+            .verdict-strip{
+                grid-template-columns: 1fr;
+            }
+
+            .circle-box{
+                width: 180px;
+                height: 180px;
+            }
+
+            .circle-text span{
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <div class="nav-left">
+            <div class="logo">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>PhishGuard AI</span>
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="{{ url_for('history') }}" class="nav-btn">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>History</span>
+            </a>
+
+            <span class="welcome-text">
+                <i class="fa-solid fa-user"></i>
+                {{ user_name }}
+            </span>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+
+            <section class="dashboard-card result-card premium-result-card fade-in-up">
+
+                <!-- HERO SECTION -->
+                <div class="hero-result">
+                    <div class="hero-left">
+                        <div class="hero-top">
+                            <div>
+                                <h1 class="hero-title">
+                                    {% if result.risk == 'High Risk' %}
+                                        <i class="fa-solid fa-triangle-exclamation"></i> This website looks risky
+                                    {% elif result.risk == 'Suspicious' %}
+                                        <i class="fa-solid fa-eye"></i> This website needs caution
+                                    {% else %}
+                                        <i class="fa-solid fa-circle-check"></i> This website looks safer
+                                    {% endif %}
+                                </h1>
+
+                                <p class="hero-sub">
+                                    {% if result.risk == 'High Risk' %}
+                                        Our system found strong warning signs that this link may be unsafe or misleading.
+                                    {% elif result.risk == 'Suspicious' %}
+                                        Our system found some unusual signs. It may be safe, but you should verify before trusting it.
+                                    {% else %}
+                                        Our system did not find major warning signs in this scan. Still, always verify websites before entering personal details.
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            <div class="risk-chip
+                                {% if result.risk == 'High Risk' %}
+                                    danger
+                                {% elif result.risk == 'Suspicious' %}
+                                    warn
+                                {% else %}
+                                    safe
+                                {% endif %}
+                            ">
+                                {{ result.risk }}
+                            </div>
+                        </div>
+
+                        <div class="verdict-strip">
+                            <div class="mini-stat">
+                                <small>Submitted URL</small>
+                                <strong>{{ result.url }}</strong>
+                            </div>
+
+                            <div class="mini-stat">
+                                <small>Final Result</small>
+                                <strong>{{ result.prediction }}</strong>
+                            </div>
+
+                            <div class="mini-stat">
+                                <small>Confidence Score</small>
+                                <strong>{{ result.probability }}%</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-right">
+                        <div class="circle-box">
+                            <svg class="progress-ring" width="210" height="210">
+                                <defs>
+                                    <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#39c6ff"/>
+                                        <stop offset="50%" stop-color="#7c5cff"/>
+                                        <stop offset="100%" stop-color="#ef4444"/>
+                                    </linearGradient>
+                                </defs>
+
+                                <circle class="progress-ring-bg" cx="105" cy="105" r="70"></circle>
+                                <circle class="progress-ring-fill"
+                                        cx="105" cy="105" r="70"
+                                        style="--percent: {{ result.probability }};"></circle>
+                            </svg>
+
+                            <div class="circle-text">
+                                <span id="countValue" data-target="{{ result.probability }}">0%</span>
+                                <small>Risk Score</small>
+                            </div>
+                        </div>
+
+                        <div class="score-label">Simple visual risk indicator</div>
+
+                        <div class="score-note">
+                            {% if result.probability >= 80 %}
+                                The score is very high, so users should avoid entering passwords, bank details, or OTPs on this website.
+                            {% elif result.probability >= 50 %}
+                                The score is moderate, so users should double-check the site name, certificate, and purpose before using it.
+                            {% else %}
+                                The score is low, but users should still confirm the website identity before sharing sensitive information.
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NON-TECHNICAL EXPLANATION -->
+                <div class="friendly-grid">
+                    <div class="friendly-card">
+                        <div class="friendly-icon">
+                            <i class="fa-solid fa-lightbulb"></i>
+                        </div>
+                        <h3>What this means</h3>
+                        <p>
+                            {% if result.risk == 'High Risk' %}
+                                The website behaves like links commonly used in phishing attacks. It may try to trick users into sharing personal or financial data.
+                            {% elif result.risk == 'Suspicious' %}
+                                The website shows a few warning signs. It may not be fully dangerous, but it should not be trusted immediately.
+                            {% else %}
+                                The website does not currently show strong phishing behavior in this scan. That means it appears safer than risky websites.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="friendly-card">
+                        <div class="friendly-icon">
+                            <i class="fa-solid fa-user-shield"></i>
+                        </div>
+                        <h3>Best action for user</h3>
+                        <p>
+                            {% if result.risk == 'High Risk' %}
+                                Do not log in, do not download files, and do not submit any personal information. Leave the website immediately.
+                            {% elif result.risk == 'Suspicious' %}
+                                Verify the website from another trusted source before using it. Avoid entering sensitive details until confirmed.
+                            {% else %}
+                                You can continue carefully, but always check the domain name and look for trusted security signs before submitting data.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <div class="friendly-card">
+                        <div class="friendly-icon">
+                            <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        </div>
+                        <h3>How the system decided</h3>
+                        <p>
+                            This result is based on multiple AI models, the website link structure, and suspicious patterns usually found in fake or harmful websites.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- RISK METER + SUMMARY -->
+                <div class="result-visual-grid">
+                    <div class="visual-card">
+                        <h3><i class="fa-solid fa-gauge-high"></i> Risk Meter</h3>
+
+                        <div class="risk-meter">
+                            <div class="meter-track">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+
+                            <div class="meter-pointer-wrap">
+                                <div class="meter-pointer" id="meterPointer" style="left: {{ result.probability }}%;">
+                                    <i class="fa-solid fa-location-pin"></i>
+                                    <b>{{ result.probability }}%</b>
+                                </div>
+                            </div>
+
+                            <div class="meter-labels">
+                                <span>Safe</span>
+                                <span>Caution</span>
+                                <span>High Risk</span>
+                            </div>
+                        </div>
+
+                        <div class="model-note" style="margin-top:20px;">
+                            {% if result.risk == 'High Risk' %}
+                                <strong>Easy interpretation:</strong> This link falls in the danger zone. Non-technical users can understand this as: <em>“Do not trust this site.”</em>
+                            {% elif result.risk == 'Suspicious' %}
+                                <strong>Easy interpretation:</strong> This link falls in the caution zone. Non-technical users can understand this as: <em>“Check carefully before using.”</em>
+                            {% else %}
+                                <strong>Easy interpretation:</strong> This link falls in the safer zone. Non-technical users can understand this as: <em>“Looks okay, but stay alert.”</em>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="visual-card">
+                        <h3><i class="fa-solid fa-list-check"></i> Scan Summary</h3>
+                        <div class="summary-list">
+                            <div class="summary-item">
+                                <i class="fa-solid fa-link"></i>
+                                <span>Website link was successfully checked by the system.</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <i class="fa-solid fa-brain"></i>
+                                <span>Multiple AI models reviewed the link before giving the final result.</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <i class="fa-solid fa-shield"></i>
+                                <span>The final score shows how likely the website is to behave like a phishing page.</span>
+                            </div>
+
+                            <div class="summary-item">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                                <span>You can download the report for review, submission, or documentation.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODEL COMPARISON -->
+                <div class="graph-section">
+                    <h3><i class="fa-solid fa-chart-column"></i> AI Model Confidence Comparison</h3>
+
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar-label">
+                                <span>Random Forest</span>
+                                <span class="count-bar" data-target="{{ result.rf_prob }}">0%</span>
+                            </div>
+                            <div class="bar-bg">
+                                <div class="bar-fill rf-bar" data-width="{{ result.rf_prob }}"></div>
+                            </div>
+                        </div>
+
+                        <div class="bar-item">
+                            <div class="bar-label">
+                                <span>XGBoost</span>
+                                <span class="count-bar" data-target="{{ result.xgb_prob }}">0%</span>
+                            </div>
+                            <div class="bar-bg">
+                                <div class="bar-fill xgb-bar" data-width="{{ result.xgb_prob }}"></div>
+                            </div>
+                        </div>
+
+                        <div class="bar-item">
+                            <div class="bar-label">
+                                <span>MLP Neural Network</span>
+                                <span class="count-bar" data-target="{{ result.mlp_prob }}">0%</span>
+                            </div>
+                            <div class="bar-bg">
+                                <div class="bar-fill mlp-bar" data-width="{{ result.mlp_prob }}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="model-note">
+                        <strong>For normal users:</strong> These bars show how strongly each AI model agrees with the result.
+                        When most models give high values, the final decision becomes more reliable and easier to trust.
+                    </div>
+                </div>
+
+                <!-- RECOMMENDED ACTION -->
+                <div class="graph-section">
+                    <h3><i class="fa-solid fa-shield-heart"></i> Recommended Next Step</h3>
+
+                    <div class="action-row">
+                        {% if result.risk == 'High Risk' %}
+                            <div class="action-card">
+                                <i class="fa-solid fa-ban"></i>
+                                <h4>Do not continue</h4>
+                                <p>Avoid login, payments, downloads, or form submission on this website.</p>
+                            </div>
+                            <div class="action-card">
+                                <i class="fa-solid fa-lock"></i>
+                                <h4>Protect your account</h4>
+                                <p>If you already entered details, change your password immediately and enable extra security.</p>
+                            </div>
+                            <div class="action-card">
+                                <i class="fa-solid fa-share-nodes"></i>
+                                <h4>Warn others</h4>
+                                <p>Do not share the link. Report it to your guide, teacher, or security team if needed.</p>
+                            </div>
+                        {% elif result.risk == 'Suspicious' %}
+                            <div class="action-card">
+                                <i class="fa-solid fa-eye"></i>
+                                <h4>Verify first</h4>
+                                <p>Check the domain name carefully and confirm the website from another trusted source.</p>
+                            </div>
+                            <div class="action-card">
+                                <i class="fa-solid fa-user-secret"></i>
+                                <h4>Avoid sensitive data</h4>
+                                <p>Do not enter passwords, card details, or personal information until fully verified.</p>
+                            </div>
+                            <div class="action-card">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <h4>Stay cautious</h4>
+                                <p>The site may still be genuine, but the system found patterns that need extra attention.</p>
+                            </div>
+                        {% else %}
+                            <div class="action-card">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <h4>Looks safer</h4>
+                                <p>No major phishing warning was detected in this scan.</p>
+                            </div>
+                            <div class="action-card">
+                                <i class="fa-solid fa-globe"></i>
+                                <h4>Still verify domain</h4>
+                                <p>Always check the exact website name before entering personal details.</p>
+                            </div>
+                            <div class="action-card">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <h4>Use normal caution</h4>
+                                <p>Even safe-looking websites should be used carefully when passwords or payments are involved.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- TECHNICAL SECTION -->
+                <div class="graph-section">
+                    <h3><i class="fa-solid fa-microchip"></i> Technical Indicators</h3>
+                    <ul class="feature-list">
+                        {% for key, value in result.top_features %}
+                            <li>
+                                <span>{{ key }}</span>
+                                <strong>{{ value }}</strong>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <div class="model-note">
+                        <strong>Note:</strong> This section is useful for project review, documentation, and technical explanation.
+                        Non-technical users can mainly focus on the verdict, risk meter, and recommended action above.
+                    </div>
+                </div>
+
+                <div class="report-actions">
+                    <a href="{{ url_for('dashboard') }}" class="secondary-btn report-btn">
+                        <i class="fa-solid fa-arrow-left"></i> Back to Dashboard
+                    </a>
+
+                    <a href="{{ url_for('download_report') }}" class="main-btn report-btn">
+                        <i class="fa-solid fa-file-arrow-down"></i> Download Report
+                    </a>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <script>
+        function animateCount(element, target, duration = 1800) {
+            let startTime = null;
+
+            function updateCount(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = Math.min((currentTime - startTime) / duration, 1);
+                const currentValue = (progress * target).toFixed(2);
+                element.textContent = currentValue + "%";
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCount);
+                } else {
+                    element.textContent = Number(target).toFixed(2) + "%";
+                }
+            }
+
+            requestAnimationFrame(updateCount);
+        }
+
+        window.addEventListener("load", function () {
+            const finalCount = document.getElementById("countValue");
+            if (finalCount) {
+                const target = parseFloat(finalCount.getAttribute("data-target")) || 0;
+                animateCount(finalCount, target, 2200);
+            }
+
+            const barCounts = document.querySelectorAll(".count-bar");
+            barCounts.forEach((item, index) => {
+                const target = parseFloat(item.getAttribute("data-target")) || 0;
+                setTimeout(() => animateCount(item, target, 1500), index * 180);
+            });
+
+            const bars = document.querySelectorAll(".bar-fill");
+            bars.forEach((bar, index) => {
+                const width = parseFloat(bar.getAttribute("data-width")) || 0;
+                setTimeout(() => {
+                    bar.style.width = width + "%";
+                }, 250 + (index * 160));
+            });
+
+            const meterPointer = document.getElementById("meterPointer");
+            if (meterPointer) {
+                let value = parseFloat("{{ result.probability }}") || 0;
+                if (value < 4) value = 4;
+                if (value > 96) value = 96;
+                meterPointer.style.left = value + "%";
+            }
+        });
+    </script>
+
+</body>
+</html>

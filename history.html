@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan History | PhishGuard AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>PhishGuard AI</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="{{ url_for('dashboard') }}" class="nav-btn">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </a>
+
+            <a href="{{ url_for('history') }}" class="nav-btn">
+                <i class="fa-solid fa-clock-rotate-left"></i> History
+            </a>
+
+            <span class="welcome-text">
+                <i class="fa-solid fa-user"></i> {{ user_name }}
+            </span>
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+
+            <section class="dashboard-hero fade-in-up">
+                <div class="dashboard-hero-left">
+                    <span class="dashboard-badge">
+                        <i class="fa-solid fa-database"></i> Stored Scan Records
+                    </span>
+                    <h1>Scan History</h1>
+                    <p>
+                        View all previously analyzed URLs along with phishing prediction,
+                        probability score, risk category, and scan date.
+                    </p>
+                </div>
+
+                <div class="dashboard-hero-right">
+                    <div class="mini-status-card">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <div>
+                            <h4>Total Records</h4>
+                            <p>{{ history|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-card fade-in-up">
+                <div class="card-head">
+                    <div>
+                        <h2><i class="fa-solid fa-table"></i> Analysis Records</h2>
+                        <p class="dashboard-subtitle">
+                            Securely stored history of phishing analysis results
+                        </p>
+                    </div>
+
+                    <div class="scan-chip">
+                        <i class="fa-solid fa-shield"></i> Protected Logs
+                    </div>
+                </div>
+
+                {% if history %}
+                <div class="history-table-container premium-history-table">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Prediction</th>
+                                <th>Probability</th>
+                                <th>Risk Level</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for row in history %}
+                            <tr>
+                                <td class="url-cell">{{ row[0] }}</td>
+
+                                <td>
+                                    {% if row[1] == "Phishing" %}
+                                        <span class="badge danger">
+                                            <i class="fa-solid fa-triangle-exclamation"></i> Phishing
+                                        </span>
+                                    {% else %}
+                                        <span class="badge safe">
+                                            <i class="fa-solid fa-circle-check"></i> Safe
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <div class="history-probability">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: {{ row[2] }}%;"></div>
+                                        </div>
+                                        <span class="percent-text">{{ row[2] }}%</span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    {% if row[3] == "High Risk" %}
+                                        <span class="risk risk-pill high">High Risk</span>
+                                    {% elif row[3] == "Suspicious" %}
+                                        <span class="risk risk-pill medium">Suspicious</span>
+                                    {% else %}
+                                        <span class="risk risk-pill low">Safe</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="date-cell">{{ row[4] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-history-box">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <h3>No Scan History Found</h3>
+                    <p>You have not analyzed any URLs yet. Start scanning to build your history.</p>
+                    <a href="{{ url_for('dashboard') }}" class="main-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i> Analyze URL
+                    </a>
+                </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </main>
+
+</body>
+</html>

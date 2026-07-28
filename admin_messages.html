@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Messages</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>PhishGuard AI</span>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('home') }}" class="nav-btn">Home</a>
+        </div>
+    </nav>
+
+    <main class="dashboard-main">
+        <div class="dashboard-card">
+            <h1>Contact Messages</h1>
+            <p class="dashboard-subtitle">Messages submitted from homepage contact form</p>
+
+            <div class="history-table-container">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for msg in messages %}
+                        <tr>
+                            <td>{{ msg[0] }}</td>
+                            <td>{{ msg[1] }}</td>
+                            <td>{{ msg[2] }}</td>
+                            <td>{{ msg[3] }}</td>
+                            <td class="url-cell">{{ msg[4] }}</td>
+                            <td>{{ msg[5] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

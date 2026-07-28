@@ -1,0 +1,13 @@
+Flask
+pandas
+joblib
+scikit-learn
+xgboost
+numpy
+requests
+beautifulsoup4
+tldextract
+xhtml2pdf
+reportlab
+Werkzeug
+matplotlib

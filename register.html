@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | PhishGuard AI</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body.auth-body{
+            min-height:100vh;
+            background:
+                linear-gradient(rgba(2, 10, 8, 0.82), rgba(1, 8, 6, 0.9)),
+                url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80") no-repeat center center/cover;
+            overflow:hidden;
+            position:relative;
+            color:#fff;
+        }
+
+        body.auth-body::before,
+        body.auth-body::after{
+            content:"";
+            position:absolute;
+            border-radius:50%;
+            filter:blur(90px);
+            z-index:0;
+            animation:floatGlow 8s ease-in-out infinite alternate;
+        }
+
+        body.auth-body::before{
+            width:300px;
+            height:300px;
+            background:rgba(0,255,136,0.10);
+            top:8%;
+            left:5%;
+        }
+
+        body.auth-body::after{
+            width:260px;
+            height:260px;
+            background:rgba(0,255,255,0.08);
+            bottom:8%;
+            right:8%;
+        }
+
+        @keyframes floatGlow{
+            0%{transform:translateY(0) translateX(0) scale(1);}
+            100%{transform:translateY(20px) translateX(12px) scale(1.08);}
+        }
+
+        .cyber-grid{
+            position:absolute;
+            inset:0;
+            background-image:
+                linear-gradient(rgba(0,255,136,0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,136,0.08) 1px, transparent 1px);
+            background-size:40px 40px;
+            z-index:0;
+            animation:gridMove 12s linear infinite;
+            opacity:0.35;
+        }
+
+        @keyframes gridMove{
+            0%{transform:translateY(0);}
+            100%{transform:translateY(40px);}
+        }
+
+        .auth-wrapper{
+            position:relative;
+            z-index:2;
+            min-height:100vh;
+            display:grid;
+            grid-template-columns:1fr 1fr;
+        }
+
+        .auth-left{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:60px;
+        }
+
+        .auth-left-content{
+            max-width:560px;
+            animation:slideLeft 1s ease;
+        }
+
+        .brand-tag{
+            display:inline-block;
+            padding:8px 16px;
+            border:1px solid rgba(0,255,136,0.3);
+            background:rgba(0,255,136,0.08);
+            color:#00ff99;
+            border-radius:30px;
+            font-size:14px;
+            letter-spacing:1px;
+            margin-bottom:24px;
+            backdrop-filter:blur(8px);
+            box-shadow:0 0 20px rgba(0,255,136,0.08);
+        }
+
+        .auth-left h1{
+            font-size:3rem;
+            line-height:1.1;
+            margin-bottom:20px;
+            font-weight:800;
+            color:#fff;
+            text-shadow:0 0 20px rgba(0,255,136,0.15);
+        }
+
+        .auth-left h1 span{
+            color:#00ff99;
+        }
+
+        .auth-left p{
+            font-size:1.03rem;
+            line-height:1.8;
+            color:#cfd8dc;
+            margin-bottom:28px;
+        }
+
+        .feature-list{
+            display:grid;
+            gap:14px;
+        }
+
+        .feature-item{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            color:#dce7e2;
+            font-size:15px;
+            background:rgba(255,255,255,0.03);
+            border:1px solid rgba(0,255,136,0.12);
+            padding:14px 16px;
+            border-radius:14px;
+            backdrop-filter:blur(8px);
+        }
+
+        .feature-item i{
+            color:#00ff99;
+            font-size:16px;
+        }
+
+        .auth-right{
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:40px;
+        }
+
+        .form-box{
+            width:100%;
+            max-width:460px;
+            background:rgba(5, 18, 14, 0.72);
+            border:1px solid rgba(0,255,136,0.18);
+            border-radius:24px;
+            padding:38px 30px;
+            backdrop-filter:blur(18px);
+            box-shadow:
+                0 0 30px rgba(0,255,136,0.08),
+                0 15px 50px rgba(0,0,0,0.45);
+            animation:slideRight 1s ease;
+            position:relative;
+            overflow:hidden;
+        }
+
+        .form-box::before{
+            content:"";
+            position:absolute;
+            top:-80px;
+            right:-80px;
+            width:180px;
+            height:180px;
+            background:radial-gradient(circle, rgba(0,255,136,0.16), transparent 70%);
+            z-index:0;
+        }
+
+        .form-box > *{
+            position:relative;
+            z-index:2;
+        }
+
+        .logo-box{
+            width:68px;
+            height:68px;
+            border-radius:18px;
+            background:linear-gradient(135deg, rgba(0,255,136,0.15), rgba(0,255,255,0.08));
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            margin:0 auto 18px;
+            border:1px solid rgba(0,255,136,0.2);
+            box-shadow:0 0 20px rgba(0,255,136,0.12);
+        }
+
+        .logo-box i{
+            font-size:28px;
+            color:#00ff99;
+        }
+
+        .form-box h2{
+            text-align:center;
+            font-size:2rem;
+            margin-bottom:8px;
+            color:#fff;
+        }
+
+        .form-subtitle{
+            text-align:center;
+            color:#aab8b2;
+            font-size:14px;
+            margin-bottom:28px;
+        }
+
+        .msg{
+            margin-bottom:16px;
+            padding:12px 14px;
+            border-radius:12px;
+            font-size:14px;
+            border-left:4px solid;
+        }
+
+        .msg.success{
+            background:rgba(0,255,136,0.08);
+            color:#8fffc7;
+            border-color:#00ff99;
+        }
+
+        .msg.danger,
+        .msg.error{
+            background:rgba(255,77,77,0.12);
+            color:#ffb3b3;
+            border-color:#ff4d4d;
+        }
+
+        .input-group{
+            position:relative;
+            margin-bottom:18px;
+        }
+
+        .input-group i.input-icon{
+            position:absolute;
+            top:50%;
+            left:16px;
+            transform:translateY(-50%);
+            color:#00ff99;
+            font-size:15px;
+        }
+
+        .input-group input{
+            width:100%;
+            height:52px;
+            background:rgba(255,255,255,0.04);
+            border:1px solid rgba(255,255,255,0.08);
+            border-radius:14px;
+            outline:none;
+            padding:0 48px 0 46px;
+            color:#fff;
+            font-size:15px;
+            transition:0.3s ease;
+        }
+
+        .input-group input:focus{
+            border-color:#00ff99;
+            box-shadow:0 0 0 3px rgba(0,255,136,0.08);
+            background:rgba(255,255,255,0.06);
+        }
+
+        .input-group input::placeholder{
+            color:#94a3a0;
+        }
+
+        .toggle-password{
+            position:absolute;
+            top:50%;
+            right:16px;
+            transform:translateY(-50%);
+            color:#b8c7c2;
+            cursor:pointer;
+            font-size:15px;
+        }
+
+        .main-btn{
+            width:100%;
+            height:52px;
+            border:none;
+            border-radius:14px;
+            background:linear-gradient(135deg, #00c853, #00ff99);
+            color:#04130c;
+            font-size:16px;
+            font-weight:700;
+            cursor:pointer;
+            transition:0.3s ease;
+            box-shadow:0 10px 25px rgba(0,255,136,0.18);
+        }
+
+        .main-btn:hover{
+            transform:translateY(-2px);
+            box-shadow:0 14px 28px rgba(0,255,136,0.24);
+        }
+
+        .bottom-text{
+            margin-top:24px;
+            text-align:center;
+            color:#cad5d1;
+            font-size:14px;
+        }
+
+        .bottom-text a{
+            color:#00ff99;
+            text-decoration:none;
+            font-weight:600;
+        }
+
+        .bottom-text a:hover{
+            text-decoration:underline;
+        }
+
+        .popup-overlay{
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.55);
+            display:none;
+            align-items:center;
+            justify-content:center;
+            z-index:9999;
+            backdrop-filter:blur(6px);
+        }
+
+        .popup-box{
+            width:90%;
+            max-width:380px;
+            background:rgba(6, 20, 16, 0.95);
+            border:1px solid rgba(0,255,136,0.25);
+            border-radius:22px;
+            padding:30px 24px;
+            text-align:center;
+            box-shadow:0 0 30px rgba(0,255,136,0.16);
+            animation:popupShow 0.35s ease;
+        }
+
+        .popup-box i{
+            font-size:48px;
+            color:#00ff99;
+            margin-bottom:14px;
+        }
+
+        .popup-box h3{
+            font-size:24px;
+            margin-bottom:10px;
+            color:#fff;
+        }
+
+        .popup-box p{
+            color:#c7d4cf;
+            font-size:15px;
+            line-height:1.6;
+            margin-bottom:20px;
+        }
+
+        .popup-btn{
+            padding:12px 24px;
+            border:none;
+            border-radius:12px;
+            background:linear-gradient(135deg, #00c853, #00ff99);
+            color:#04130c;
+            font-weight:700;
+            cursor:pointer;
+        }
+
+        @keyframes popupShow{
+            from{
+                opacity:0;
+                transform:scale(0.8);
+            }
+            to{
+                opacity:1;
+                transform:scale(1);
+            }
+        }
+
+        @keyframes slideLeft{
+            from{opacity:0; transform:translateX(-40px);}
+            to{opacity:1; transform:translateX(0);}
+        }
+
+        @keyframes slideRight{
+            from{opacity:0; transform:translateX(40px);}
+            to{opacity:1; transform:translateX(0);}
+        }
+
+        @media (max-width:991px){
+            .auth-wrapper{
+                grid-template-columns:1fr;
+            }
+
+            .auth-left{
+                display:none;
+            }
+
+            .auth-right{
+                min-height:100vh;
+                padding:24px;
+            }
+
+            .form-box{
+                max-width:100%;
+            }
+        }
+
+        @media (max-width:480px){
+            .form-box{
+                padding:28px 20px;
+                border-radius:20px;
+            }
+
+            .form-box h2{
+                font-size:1.7rem;
+            }
+        }
+    </style>
+</head>
+<body class="auth-body">
+
+    <div class="cyber-grid"></div>
+
+    <div class="auth-wrapper">
+        <div class="auth-left">
+            <div class="auth-left-content">
+                <div class="brand-tag">
+                    <i class="fa-solid fa-user-plus"></i> Secure User Enrollment
+                </div>
+
+                <h1>Create Your <span>Cyber Shield</span></h1>
+                <p>
+                    Register to access advanced phishing URL detection, AI-powered threat
+                    intelligence, and a smart cyber defense platform built for secure analysis.
+                </p>
+
+                <div class="feature-list">
+                    <div class="feature-item">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        Advanced AI threat protection access
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-fingerprint"></i>
+                        Secure account creation and protected login
+                    </div>
+                    <div class="feature-item">
+                        <i class="fa-solid fa-chart-column"></i>
+                        Personal dashboard and analysis history
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-right">
+            <div class="form-box">
+                <div class="logo-box">
+                    <i class="fa-solid fa-user-secret"></i>
+                </div>
+
+                <h2>Register</h2>
+                <p class="form-subtitle">Create your secure account</p>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <p class="msg {{ category }}">{{ message }}</p>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST">
+                    <div class="input-group">
+                        <i class="fa-solid fa-user input-icon"></i>
+                        <input type="text" name="name" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-envelope input-icon"></i>
+                        <input type="email" name="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" name="password" id="password" placeholder="Create password" required>
+                        <span class="toggle-password" onclick="togglePassword('password','eyeIcon1')">
+                            <i class="fa-solid fa-eye" id="eyeIcon1"></i>
+                        </span>
+                    </div>
+
+                    <div class="input-group">
+                        <i class="fa-solid fa-lock input-icon"></i>
+                        <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" required>
+                        <span class="toggle-password" onclick="togglePassword('confirm_password','eyeIcon2')">
+                            <i class="fa-solid fa-eye" id="eyeIcon2"></i>
+                        </span>
+                    </div>
+
+                    <button type="submit" class="main-btn">
+                        <i class="fa-solid fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+
+                <p class="bottom-text">
+                    Already have an account?
+                    <a href="{{ url_for('login') }}">Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="successPopup">
+        <div class="popup-box">
+            <i class="fa-solid fa-circle-check"></i>
+            <h3>Registration Successful</h3>
+            <p>Your secure account has been created successfully. You can now login and continue.</p>
+            <button class="popup-btn" onclick="closePopup()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(inputId, eyeId) {
+            const input = document.getElementById(inputId);
+            const eye = document.getElementById(eyeId);
+
+            if (input.type === "password") {
+                input.type = "text";
+                eye.classList.remove("fa-eye");
+                eye.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                eye.classList.remove("fa-eye-slash");
+                eye.classList.add("fa-eye");
+            }
+        }
+
+        function closePopup() {
+            document.getElementById("successPopup").style.display = "none";
+            window.location.href = "{{ url_for('login') }}";
+        }
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == "success" %}
+                        document.getElementById("successPopup").style.display = "flex";
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </script>
+
+</body>
+</html>
