@@ -103,7 +103,6 @@ http://127.0.0.1:5000
 ## 👩‍💻 Author
 
 **Chaitrali Shinde**
-
-Computer Engineering Graduate
-
-Aspiring Data Scientist | Data Analyst
+**Bhakti Nannaware**
+**Sakshi Harnawal**
+**Priyanka Gadhe**
